@@ -1,0 +1,20 @@
+http:
+  middlewares:
+    https:
+      redirectScheme:
+        scheme: https
+    # https://doc.traefik.io/traefik/middlewares/basicauth/ <-- BasicAuth Dokumentation
+    # htpasswd -n yourname
+    auth:
+      basicAuth:
+        users:
+          # ChangeMe
+          - 'yourname:bcrypt-hashed-pw'
+certificatesResolvers:
+  dns:
+    acme:
+      # ChangeMe
+      email: mail@example.com
+      storage: /LetsEncrypt/acme.json
+      dnsChallenge:
+        provider: cloudflare

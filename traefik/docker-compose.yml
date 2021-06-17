@@ -1,0 +1,44 @@
+version: "3.3"
+
+services:
+  traefik:
+    image: "traefik:v2.4.8"
+    container_name: "traefik"
+    networks:
+      - traefik_default
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./config:/etc/traefik"
+      - "LetsEncrypt:/LetsEncrypt"
+    # Keep the labels if you want the dashboard to be accessible from the web else you can savely remove them
+    labels:
+      traefik.enable: true
+      traefik.http.routers.traefik.entrypoints: websecure
+      # Change the domain
+      traefik.http.routers.traefik.rule: Host("proxy.domain.io")
+      traefik.http.routers.traefik.tls: true
+      traefik.http.routers.traefik.tls.certresolver: http
+      traefik.http.routers.traefik.service: api@internal
+      traefik.http.routers.traefik_insecure.entrypoints: web
+      traefik.http.routers.traefik_insecure.middlewares: https@file
+      # Change the domain
+      traefik.http.routers.traefik_insecure.rule: Host("proxy.domain.io")
+      traefik.http.services.traefik.loadbalancer.server.port: 8080
+      traefik.http.services.traefik.loadbalancer.server.scheme: http
+      # If you want the dashboard to be protected
+      traefik.http.routers.traefik.middlewares: auth@file
+
+volumes:
+  LetsEncrypt:
+networks:
+  traefik_default:
+    driver: bridge

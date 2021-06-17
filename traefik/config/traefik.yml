@@ -1,0 +1,52 @@
+global:
+  sendAnonymousUsage: false
+serversTransport:
+  insecureSkipVerify: true
+entryPoints:
+  web:
+    address: ':80'
+  websecure:
+    address: ':443'
+# set 'dashboard' to false if you dont want to use the dashboard
+api:
+  dashboard: true
+  insecure: false
+  debug: true
+providers:
+  file:
+    filename: /etc/traefik/dynamic.yml
+    watch: true
+  docker:
+    exposedByDefault: false
+    network: traefik_default
+log:
+  level: DEBUG
+certificatesResolvers:
+  staging:
+    acme:
+      # ChangeMe
+      email: mail@example.com
+      caServer: 'https://acme-staging-v02.api.letsencrypt.org/directory'
+      storage: /LetsEncrypt/acme_staging.json
+      httpChallenge:
+        entryPoint: web
+  http:
+    acme:
+      # ChangeMe
+      email: mail@example.com
+      storage: /LetsEncrypt/acme.json
+      httpChallenge:
+        entryPoint: web
+  tls:
+    acme:
+      # ChangeMe
+      email: mail@example.com
+      storage: /LetsEncrypt/acme.json
+      tlsChallenge: {}
+  dns:
+    acme:
+      # ChangeMe
+      email: mail@example.com
+      storage: /LetsEncrypt/acme.json
+      dnsChallenge:
+        provider: cloudflare
